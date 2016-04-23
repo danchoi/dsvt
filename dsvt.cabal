@@ -17,7 +17,7 @@ executable dsvt
   build-depends:       base >=4.6 && <4.9
                      , aeson >= 0.8.0.0
                      , bytestring
-                     , attoparsec >= 0.12.0.0
+                     , parsec
                      , containers
                      , unordered-containers
                      , text >= 1.0.0.0
