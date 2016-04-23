@@ -25,4 +25,5 @@ executable dsvt
                      , vector
                      , scientific
                      , optparse-applicative
+                     , mtl
   default-language:    Haskell2010
