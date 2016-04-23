@@ -81,7 +81,7 @@ stringChoice = do
     char '{' >> spaces
     pairs :: [(String, Expr)] <- 
           sepBy1 ((,) <$> varName <*> (char ':' >> spaces >> expr <* spaces)) 
-                  (char ',' >> spaces)
+                 (char ',' >> spaces)
     spaces >> char '}' >> spaces
     return $ StringChoice $ M.fromList pairs
 
