@@ -47,12 +47,12 @@ runParse parser inp =
 ------------------------------------------------------------------------     
 -- expression parsers
 
-data Expr = FieldNum Int
+data Expr = FieldNum Int  -- access to DSV fields
           | And Expr Expr
           | Or Expr Expr
           | Compare String Expr Expr
-          | StringChoice (M.Map String Expr)
-          | LiteralExpr Literal
+          | StringChoice (M.Map String Expr)  -- usually for css class selection
+          | LiteralExpr Literal -- used in the context of comparison
           deriving (Eq, Show)
 
 data Literal = LitString String | LitNumber Int | LitBool Bool
@@ -79,7 +79,9 @@ expr = do
 
 stringChoice = do
     char '{' >> spaces
-    pairs :: [(String, Expr)] <- sepBy1 ((,) <$> varName <*> (char ':' >> spaces >> expr <* spaces)) (char ',' >> spaces)
+    pairs :: [(String, Expr)] <- 
+          sepBy1 ((,) <$> varName <*> (char ':' >> spaces >> expr <* spaces)) 
+                  (char ',' >> spaces)
     spaces >> char '}' >> spaces
     return $ StringChoice $ M.fromList pairs
 
@@ -93,7 +95,6 @@ exprTerm = (char '(' *> expr <* char ')') <|> literalExpr <|> fieldNum
 
 fieldNum :: ExprParser Expr
 fieldNum = (FieldNum . read) <$> (char '$' *> many1 digit)
-
 
 varName = many1 (alphaNum <|> char '$' <|> char '_')
 
