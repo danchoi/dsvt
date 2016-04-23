@@ -41,7 +41,7 @@ exprEvalToBool (And x y) = undefined
 exprEvalToBool (Or x y) = undefined
 exprEvalToBool (Compare op x y) = undefined
 exprEvalToBool (StringChoice map) = undefined
-exprEvalToBool (LiteralExpr x) = undefined
+exprEvalToBool (LiteralExpr x) = return $ litToBool x
 
 litToBool :: Literal -> Bool
 litToBool (LitString "") = False
