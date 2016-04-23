@@ -26,9 +26,9 @@ evalToBool e =
 
 -- handle all the cases
 exprEval :: Expr -> Context -> 
-exprEval (FieldNum n) ==
+exprEval (FieldNum n) =
 exprEval (And x y) =
 exprEval (Or x y) =
-exprEval (StringChoice map) =
 exprEval (Compare op x y) =
-
+exprEval (StringChoice map) =
+exprEval (LiteralExpr x) =
