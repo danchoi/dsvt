@@ -29,16 +29,20 @@ evalToBool e =
 
 exprEvalToString :: Expr -> Reader' String 
 exprEvalToString (FieldNum n) = undefined
-exprEvalToString (And x y) = undefined
-exprEvalToString (Or x y) = undefined
-exprEvalToString (Compare op x y) = undefined
+exprEvalToString x@(And _ _) = show <$> exprEvalToBool x
+exprEvalToString x@(Or _ _) = show <$> exprEvalToBool x
+exprEvalToString x@(Compare _ _ _) = show <$> exprEvalToBool x
 exprEvalToString (StringChoice map) = undefined
 exprEvalToString (LiteralExpr x) = return . show . litToBool $ x
 
 exprEvalToBool :: Expr -> Reader' Bool
 exprEvalToBool (FieldNum n) = undefined
-exprEvalToBool (And x y) = undefined
-exprEvalToBool (Or x y) = undefined
+exprEvalToBool (And x y) = do
+      x' <- exprEvalToBool x 
+      if x' then exprEvalToBool y else return False
+exprEvalToBool (Or x y) = do
+      x' <- exprEvalToBool x
+      if x' then return True else exprEvalToBool y
 exprEvalToBool (Compare op x y) = undefined
 exprEvalToBool x@(StringChoice _) = (litToBool . LitString) <$> (exprEvalToString x)
 exprEvalToBool (LiteralExpr x) = return $ litToBool x
