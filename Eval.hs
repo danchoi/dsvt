@@ -10,7 +10,7 @@ import Control.Monad.Reader
 type Reader' = Reader Context 
 
 data Context = Context {
-      fields :: [Text] -- the DSV fields
+      fields :: [Text] -- the DSV field values, as text
     , trueStrings :: [Text]
     , falseStrings :: [Text]
     , nullStrings :: [Text]
@@ -27,21 +27,21 @@ evalToBool e =
 -}
 
 
-exprEvalToString :: Expr -> Context -> String
-exprEvalToString (FieldNum n) Context{..} = undefined
-exprEvalToString (And x y) Context{..} = undefined
-exprEvalToString (Or x y) Context{..} = undefined
-exprEvalToString (Compare op x y) Context{..} = undefined
-exprEvalToString (StringChoice map) Context{..} = undefined
-exprEvalToString (LiteralExpr x) _ = undefined
+exprEvalToString :: Expr -> Reader' String 
+exprEvalToString (FieldNum n) = undefined
+exprEvalToString (And x y) = undefined
+exprEvalToString (Or x y) = undefined
+exprEvalToString (Compare op x y) = undefined
+exprEvalToString (StringChoice map) = undefined
+exprEvalToString (LiteralExpr x) = undefined
 
-exprEvalToBool :: Expr -> Context -> Bool
-exprEvalToBool (FieldNum n) Context{..} = undefined
-exprEvalToBool (And x y) Context{..} = undefined
-exprEvalToBool (Or x y) Context{..} = undefined
-exprEvalToBool (Compare op x y) Context{..} = undefined
-exprEvalToBool (StringChoice map) Context{..} = undefined
-exprEvalToBool (LiteralExpr x) _ = undefined
+exprEvalToBool :: Expr -> Reader' Bool
+exprEvalToBool (FieldNum n) = undefined
+exprEvalToBool (And x y) = undefined
+exprEvalToBool (Or x y) = undefined
+exprEvalToBool (Compare op x y) = undefined
+exprEvalToBool (StringChoice map) = undefined
+exprEvalToBool (LiteralExpr x) = undefined
 
 litToBool :: Literal -> Bool
 litToBool = undefined
