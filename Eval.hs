@@ -44,4 +44,7 @@ exprEvalToBool (StringChoice map) = undefined
 exprEvalToBool (LiteralExpr x) = undefined
 
 litToBool :: Literal -> Bool
-litToBool = undefined
+litToBool (LitString "") = False
+litToBool (LitBool False) = False
+litToBool LitNull = False
+litToBool _ = True
