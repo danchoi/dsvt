@@ -33,14 +33,14 @@ exprEvalToString (And x y) = undefined
 exprEvalToString (Or x y) = undefined
 exprEvalToString (Compare op x y) = undefined
 exprEvalToString (StringChoice map) = undefined
-exprEvalToString (LiteralExpr x) = undefined
+exprEvalToString (LiteralExpr x) = return . show . litToBool $ x
 
 exprEvalToBool :: Expr -> Reader' Bool
 exprEvalToBool (FieldNum n) = undefined
 exprEvalToBool (And x y) = undefined
 exprEvalToBool (Or x y) = undefined
 exprEvalToBool (Compare op x y) = undefined
-exprEvalToBool (StringChoice map) = undefined
+exprEvalToBool x@(StringChoice _) = (litToBool . LitString) <$> (exprEvalToString x)
 exprEvalToBool (LiteralExpr x) = return $ litToBool x
 
 litToBool :: Literal -> Bool
@@ -48,3 +48,5 @@ litToBool (LitString "") = False
 litToBool (LitBool False) = False
 litToBool LitNull = False
 litToBool _ = True
+
+
