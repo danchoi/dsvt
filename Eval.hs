@@ -62,8 +62,8 @@ exprEvalToBool (Or x y) = do
       x' <- exprEvalToBool x
       if x' then return True else exprEvalToBool y
 exprEvalToBool (Compare op x y) = do
-      vx <- comparableValue =<< exprEvalToString x 
-      vy <- comparableValue =<< exprEvalToString y 
+      vx <- comparableValue x 
+      vy <- comparableValue y 
       return $
         case op of   
             ">" -> vx > vy
@@ -84,8 +84,8 @@ litToBool (LitBool False) = False
 litToBool LitNull = False
 litToBool _ = True
 
-comparableValue :: Text -> Reader' ComparableValue
-comparableValue "" = undefined
+comparableValue :: Expr -> Reader' ComparableValue
+-- comparableValue "" = undefined
 comparableValue x = error $ "can't make comparable value for " ++ show x
 
 
