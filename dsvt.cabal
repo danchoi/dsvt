@@ -1,0 +1,27 @@
+name:                dsvt
+version:             0.1.0.0
+synopsis:            JSON to TSV transformer
+homepage:            https://github.com/danchoi/dsvt
+description:         CHANGME
+license:             MIT
+license-file:        LICENSE
+author:              Daniel Choi
+maintainer:          dhchoi@gmail.com
+copyright:           (c) 2016 Daniel Choi
+category:            Text
+build-type:          Simple
+cabal-version:       >=1.10
+
+executable dsvt
+  main-is:             Main.hs
+  build-depends:       base >=4.6 && <4.9
+                     , aeson >= 0.8.0.0
+                     , bytestring
+                     , attoparsec >= 0.12.0.0
+                     , containers
+                     , unordered-containers
+                     , text >= 1.0.0.0
+                     , vector
+                     , scientific
+                     , optparse-applicative
+  default-language:    Haskell2016
