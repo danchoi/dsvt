@@ -36,7 +36,17 @@ opts = O.info (O.helper <*> options)
 main = do
     Options{..} <- O.execParser opts
     undefined
-     
+
+runParse :: ExprParser a -> String -> a
+runParse parser inp =
+  case Text.Parsec.parse parser "" inp of
+    Left x -> error $ "parser failed: " ++ show x
+    Right xs -> xs
+
+
+------------------------------------------------------------------------     
+-- expression parsers
+
 data Expr = FieldNum Int
           | And Expr Expr
           | Or Expr Expr
@@ -96,11 +106,36 @@ litString = LitString <$> ((char '"' *> many (noneOf "\"") <* char '"') <|> (cha
 
 litBool = LitBool <$> ((try (string "true") *> pure True) <|> (try (string "false") *> pure False))
 
+------------------------------------------------------------------------
+-- free text interpolation
 
-runParse :: ExprParser a -> String -> a
-runParse parser inp =
-  case Text.Parsec.parse parser "" inp of
-    Left x -> error $ "parser failed: " ++ show x
-    Right xs -> xs
+parseText :: String -> [TextChunk]
+parseText = runParse (many textChunk) 
+
+textChunk :: ExprParser TextChunk
+textChunk = interpolationChunk <|> passThroughChunk
+
+interpolationChunk = do
+    try (string "{{")
+    spaces
+    xs <- manyTill anyChar (lookAhead $ try (string "}}"))
+    spaces
+    string "}}"
+    return $ Interpolation xs
+
+passThroughChunk = PassThrough <$> passThrough
+
+passThrough = do
+    -- a lead single { char. This is guaranteed not to be part of {{
+    t <- optionMaybe (string "{") 
+    xs <- many1 (noneOf "{") 
+    x <- (eof *> pure "{{") <|> lookAhead (try (string "{{") <|> string "{")
+    res <- case x of 
+              "{{" -> return []
+              "{" -> ('{':) <$> passThrough 
+    return $ (fromMaybe "" t) ++ xs ++ res
+
+------------------------------------------------------------------------
+
 
 
