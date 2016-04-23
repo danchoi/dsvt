@@ -47,6 +47,9 @@ runParse parser inp =
 ------------------------------------------------------------------------     
 -- expression parsers
 
+-- Fields are accessed with $NUM where NUM is an integer, starting at 1,
+-- like awk.
+
 data Expr = FieldNum Int  -- access to DSV fields
           | And Expr Expr
           | Or Expr Expr
@@ -55,7 +58,7 @@ data Expr = FieldNum Int  -- access to DSV fields
           | LiteralExpr Literal -- used in the context of comparison
           deriving (Eq, Show)
 
-data Literal = LitString String | LitNumber Int | LitBool Bool
+data Literal = LitString String | LitNumber Int | LitBool Bool | LitNull
     deriving (Eq, Show)
 
 data TextChunk = PassThrough String | Interpolation String 
@@ -98,7 +101,9 @@ fieldNum = (FieldNum . read) <$> (char '$' *> many1 digit)
 
 varName = many1 (alphaNum <|> char '$' <|> char '_')
 
-literalExpr = LiteralExpr <$> (litNumber <|> litString <|> litBool)
+literalExpr = LiteralExpr <$> (litNumber <|> litString <|> litBool <|> litNull)
+
+litNull = pure LitNull <* string "null"
 
 litNumber = LitNumber . read <$> many1 digit  
 
