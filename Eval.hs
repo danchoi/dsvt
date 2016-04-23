@@ -3,8 +3,9 @@ module Eval where
 import Expression
 import Control.Applicative
 import qualified Data.Map as M
-import Data.Text (Text)
-import Data.Functor.Identity (Identity )
+import Data.Text (Text, pack, unpack)
+import qualified Data.Text as T
+import Data.Functor.Identity (Identity)
 import Control.Monad.Reader
 
 type Reader' = Reader Context 
@@ -26,16 +27,27 @@ evalToBool e =
     in valueToBool val
 -}
 
-exprEvalToString :: Expr -> Reader' String 
-exprEvalToString (FieldNum n) = undefined
-exprEvalToString x@(And _ _) = show <$> exprEvalToBool x
-exprEvalToString x@(Or _ _) = show <$> exprEvalToBool x
-exprEvalToString x@(Compare _ _ _) = show <$> exprEvalToBool x
+exprEvalToString :: Expr -> Reader' Text
+exprEvalToString (FieldNum n) = do
+      xs <- fields <$> ask 
+      return $ xs !! (n - 1)
+exprEvalToString x@(And _ _) = boolToText <$> exprEvalToBool x
+exprEvalToString x@(Or _ _) = boolToText <$> exprEvalToBool x
+exprEvalToString x@(Compare _ _ _) = boolToText <$> exprEvalToBool x
 exprEvalToString (StringChoice map) = undefined
-exprEvalToString (LiteralExpr x) = return . show . litToBool $ x
+exprEvalToString (LiteralExpr x) = return . boolToText . litToBool $ x
+
+
+boolToText :: Bool -> Text 
+boolToText = pack . show 
 
 exprEvalToBool :: Expr -> Reader' Bool
-exprEvalToBool (FieldNum n) = undefined
+exprEvalToBool x@(FieldNum _) = do
+      s <- exprEvalToString x
+      Context{..} <- ask
+      return $ 
+          (not $ T.null s) && 
+          (not $ s `elem` (nullStrings ++ falseStrings))
 exprEvalToBool (And x y) = do
       x' <- exprEvalToBool x 
       if x' then exprEvalToBool y else return False
@@ -56,7 +68,7 @@ exprEvalToBool (Compare op x y) = do
             "/=" -> vx /= vy
             "<>" -> vx /= vy
             x -> error $ "Unsupported comparison operator: " ++ x
-exprEvalToBool x@(StringChoice _) = (litToBool . LitString) <$> (exprEvalToString x)
+exprEvalToBool x@(StringChoice _) = (litToBool . LitString . unpack) <$> (exprEvalToString x)
 exprEvalToBool (LiteralExpr x) = return $ litToBool x
 
 litToBool :: Literal -> Bool
@@ -65,7 +77,7 @@ litToBool (LitBool False) = False
 litToBool LitNull = False
 litToBool _ = True
 
-comparableValue :: String -> Reader' ComparableValue
+comparableValue :: Text -> Reader' ComparableValue
 comparableValue "" = undefined
 comparableValue x = error $ "can't make comparable value for " ++ show x
 
