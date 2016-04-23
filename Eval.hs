@@ -61,6 +61,7 @@ exprEvalToBool (And x y) = do
 exprEvalToBool (Or x y) = do
       x' <- exprEvalToBool x
       if x' then return True else exprEvalToBool y
+-- see p.96 of Effective Awk Programming 3rd ed.
 exprEvalToBool (Compare op x y) = do
       vx <- comparableValue x 
       vy <- comparableValue y 
@@ -80,8 +81,7 @@ exprEvalToBool (LiteralExpr x) = return $ litToBool x
 
 litToBool :: Literal -> Bool
 litToBool (LitString "") = False
-litToBool (LitBool False) = False
-litToBool LitNull = False
+litToBool (LitNumber 0) = False
 litToBool _ = True
 
 comparableValue :: Expr -> Reader' ComparableValue

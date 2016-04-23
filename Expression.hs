@@ -27,7 +27,7 @@ data Expr = FieldNum Int  -- access to DSV fields
           | LiteralExpr Literal -- used in the context of comparison
           deriving (Eq, Show)
 
-data Literal = LitString String | LitNumber Int | LitBool Bool | LitNull
+data Literal = LitString String | LitNumber Int 
     deriving (Eq, Show)
 
 data TextChunk = PassThrough String | Interpolation String 
@@ -35,8 +35,6 @@ data TextChunk = PassThrough String | Interpolation String
 
 data ComparableValue = ComparableNumberValue Int
                      | ComparableStringValue String
-                     | ComparableBoolValue Bool
-                     | ComparableNullValue 
     deriving (Ord, Eq, Show)
 
 type ExprParser = ParsecT String () Identity 
@@ -70,16 +68,14 @@ fieldNum = (FieldNum . read) <$> (char '$' *> many1 digit)
 
 varName = many1 (alphaNum <|> char '$' <|> char '_')
 
-literalExpr = LiteralExpr <$> (litNumber <|> litString <|> litBool <|> litNull)
+literalExpr = LiteralExpr <$> (litNumber <|> litString)
 
-litNull = pure LitNull <* string "null"
-
+-- CHANGE To allow negative and double
 litNumber = LitNumber . read <$> many1 digit  
 
 -- dumb simple implementation that does not deal with escaping
 litString = LitString <$> ((char '"' *> many (noneOf "\"") <* char '"') <|> (char '\'' *> many (noneOf "'") <* char '\''))
 
-litBool = LitBool <$> ((try (string "true") *> pure True) <|> (try (string "false") *> pure False))
 
 ------------------------------------------------------------------------
 -- free text interpolation
