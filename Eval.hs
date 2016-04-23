@@ -16,6 +16,7 @@ data Context = Context {
     , nullStrings :: [Text]
     } deriving Show
 
+{-
 exprEvalToString :: Expr -> Reader' String
 exprEvalToString e = undefined
 
@@ -23,12 +24,22 @@ evalToBool :: Expr -> Reader' Bool
 evalToBool e =
     let val = exprEval expr context
     in valueToBool val
+-}
 
--- handle all the cases
-exprEval :: Expr -> Context -> 
-exprEval (FieldNum n) =
-exprEval (And x y) =
-exprEval (Or x y) =
-exprEval (Compare op x y) =
-exprEval (StringChoice map) =
-exprEval (LiteralExpr x) =
+
+exprEvalToString :: Expr -> Context -> String
+exprEvalToString (FieldNum n) Context{..} = undefined
+exprEvalToString (And x y) Context{..} = undefined
+exprEvalToString (Or x y) Context{..} = undefined
+exprEvalToString (Compare op x y) Context{..} = undefined
+exprEvalToString (StringChoice map) Context{..} = undefined
+exprEvalToString (LiteralExpr x) Context{..} = undefined
+
+exprEvalToBool :: Expr -> Context -> Bool
+exprEvalToBool (FieldNum n) Context{..} = undefined
+exprEvalToBool (And x y) Context{..} = undefined
+exprEvalToBool (Or x y) Context{..} = undefined
+exprEvalToBool (Compare op x y) Context{..} = undefined
+exprEvalToBool (StringChoice map) Context{..} = undefined
+exprEvalToBool (LiteralExpr x) Context{..} = undefined
+
