@@ -33,7 +33,7 @@ exprEvalToString (And x y) Context{..} = undefined
 exprEvalToString (Or x y) Context{..} = undefined
 exprEvalToString (Compare op x y) Context{..} = undefined
 exprEvalToString (StringChoice map) Context{..} = undefined
-exprEvalToString (LiteralExpr x) Context{..} = undefined
+exprEvalToString (LiteralExpr x) _ = undefined
 
 exprEvalToBool :: Expr -> Context -> Bool
 exprEvalToBool (FieldNum n) Context{..} = undefined
@@ -41,5 +41,7 @@ exprEvalToBool (And x y) Context{..} = undefined
 exprEvalToBool (Or x y) Context{..} = undefined
 exprEvalToBool (Compare op x y) Context{..} = undefined
 exprEvalToBool (StringChoice map) Context{..} = undefined
-exprEvalToBool (LiteralExpr x) Context{..} = undefined
+exprEvalToBool (LiteralExpr x) _ = undefined
 
+litToBool :: Literal -> Bool
+litToBool = undefined
