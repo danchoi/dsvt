@@ -14,6 +14,7 @@ cabal-version:       >=1.10
 
 executable dsvt
   main-is:             Main.hs
+  other-modules:       Expression, Eval
   build-depends:       base >=4.6 && <4.9
                      , aeson >= 0.8.0.0
                      , bytestring

@@ -8,6 +8,7 @@ import Options.Applicative ((<>))
 import qualified Options.Applicative as O
 import Control.Applicative
 import Expression
+import Eval
 
 data Options = Options {
       delimiter :: Text
