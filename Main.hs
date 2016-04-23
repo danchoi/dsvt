@@ -97,3 +97,10 @@ litString = LitString <$> ((char '"' *> many (noneOf "\"") <* char '"') <|> (cha
 litBool = LitBool <$> ((try (string "true") *> pure True) <|> (try (string "false") *> pure False))
 
 
+runParse :: ExprParser a -> String -> a
+runParse parser inp =
+  case Text.Parsec.parse parser "" inp of
+    Left x -> error $ "parser failed: " ++ show x
+    Right xs -> xs
+
+
