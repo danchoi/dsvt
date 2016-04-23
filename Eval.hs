@@ -55,7 +55,7 @@ exprEvalToBool (Compare op x y) = do
             "!=" -> vx /= vy
             "/=" -> vx /= vy
             "<>" -> vx /= vy
-            x -> error $ "Unsupported comparison: " ++ x
+            x -> error $ "Unsupported comparison operator: " ++ x
 exprEvalToBool x@(StringChoice _) = (litToBool . LitString) <$> (exprEvalToString x)
 exprEvalToBool (LiteralExpr x) = return $ litToBool x
 
