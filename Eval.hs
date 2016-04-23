@@ -7,6 +7,8 @@ import Data.Text (Text, pack, unpack)
 import qualified Data.Text as T
 import Data.Functor.Identity (Identity)
 import Control.Monad.Reader
+import Data.List (intersperse)
+import Control.Arrow (first)
 
 type Reader' = Reader Context 
 
@@ -34,9 +36,14 @@ exprEvalToString (FieldNum n) = do
 exprEvalToString x@(And _ _) = boolToText <$> exprEvalToBool x
 exprEvalToString x@(Or _ _) = boolToText <$> exprEvalToBool x
 exprEvalToString x@(Compare _ _ _) = boolToText <$> exprEvalToBool x
-exprEvalToString (StringChoice map) = undefined
+exprEvalToString (StringChoice m) = do
+      let xs :: [(Text, Expr)] = map (first pack) $ M.toList m
+      trueKeys <- fmap (map fst) $ filterM (\(k, expr) -> exprEvalToBool expr) xs 
+      return $
+        case trueKeys of
+            [] -> ""
+            xs -> mconcat $ intersperse " " $ xs 
 exprEvalToString (LiteralExpr x) = return . boolToText . litToBool $ x
-
 
 boolToText :: Bool -> Text 
 boolToText = pack . show 
