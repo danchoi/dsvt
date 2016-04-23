@@ -26,7 +26,6 @@ evalToBool e =
     in valueToBool val
 -}
 
-
 exprEvalToString :: Expr -> Reader' String 
 exprEvalToString (FieldNum n) = undefined
 exprEvalToString x@(And _ _) = show <$> exprEvalToBool x
@@ -43,7 +42,18 @@ exprEvalToBool (And x y) = do
 exprEvalToBool (Or x y) = do
       x' <- exprEvalToBool x
       if x' then return True else exprEvalToBool y
-exprEvalToBool (Compare op x y) = undefined
+exprEvalToBool (Compare op x y) = do
+      vx <- comparableValue =<< exprEvalToString x 
+      vy <- comparableValue =<< exprEvalToString y 
+      return $
+        case op of   
+            ">" -> vx > vy
+            "<" -> vx < vy
+            ">=" -> vx >= vy
+            "<=" -> vx <= vy
+            "==" -> vx == vy
+            "!=" -> vx /= vy
+            x -> error $ "Unsupported comparison: " ++ x
 exprEvalToBool x@(StringChoice _) = (litToBool . LitString) <$> (exprEvalToString x)
 exprEvalToBool (LiteralExpr x) = return $ litToBool x
 
@@ -52,5 +62,9 @@ litToBool (LitString "") = False
 litToBool (LitBool False) = False
 litToBool LitNull = False
 litToBool _ = True
+
+comparableValue :: String -> Reader' ComparableValue
+comparableValue "" = undefined
+comparableValue x = error $ "can't make comparable value for " ++ show x
 
 
