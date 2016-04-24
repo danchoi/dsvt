@@ -17,16 +17,17 @@ import Control.Monad.Reader (Reader, runReader)
 type State' = State Context 
 type Arrow' = IOSLA (XIOState Context) XmlTree XmlTree
 
-templateLine :: String -> Context -> IO String
-templateLine rawHTML context = do
-    (_,res) <- runIOSLA (processTemplate rawHTML) (initialState context) undefined
+templateLine :: Bool -> String -> Context -> IO String
+templateLine indent rawHTML context = do
+    let indent' = if indent then yes else no
+    (_,res) <- runIOSLA (processTemplate indent' rawHTML) (initialState context) undefined
     return $ concat res
 
-processTemplate html = 
-    readString [withValidate no, withParseHTML yes, withInputEncoding utf8] html
-    >>> setTraceLevel 0
-    >>> process 
-    >>> writeDocumentToString [withIndent yes, withOutputHTML, withXmlPi no]
+processTemplate indent html = 
+      readString [withValidate no, withParseHTML yes, withInputEncoding utf8] html
+      >>> setTraceLevel 0
+      >>> process 
+      >>> writeDocumentToString [withIndent indent, withOutputHTML, withXmlPi no]
 
 process :: Arrow'
 process = processTopDown (

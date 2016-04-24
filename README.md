@@ -5,6 +5,22 @@ Delimiter-separated value (DSV) templating.
 Takes a stream of DSV lines on STDIN, plus a HTML/XML template, and outputs one
 template unit per line.
 
+```
+# template
+<p><b>{{ $1 }}</b> <span>{{ $2 }}</span></p>
+```
+
+```
+# input
+banana $2.00
+apple $3.00
+beer $5.00
+```
+
+```
+# output
+
+```
 
 ### dsvt-test
 

@@ -14,6 +14,7 @@ import Template
 
 data Options = Options {
       splitOnDelimiter :: Text -> [Text]
+    , prettyIndent :: Bool
     , templateFile :: FilePath
     }
 
@@ -25,6 +26,9 @@ options = Options
             <> O.metavar "DELIMITER" 
             <> O.help "Default: whitespace")))
         <|> pure T.words)
+    <*> O.flag False True 
+        (O.short 'i'
+        <> O.help "Pretty-indent HTML output. Default: False")
     <*> O.strArgument 
         ( O.metavar "TEMPLATE-FILE" 
         <> O.help "Template file path")
@@ -45,7 +49,7 @@ main = do
       mapM (\line -> 
             let fs' = splitOnDelimiter $ TL.toStrict line
                 c = defContext { fields = fs' }
-            in templateLine template c
+            in templateLine prettyIndent template c
           ) xs
     mapM_ putStrLn res
 
