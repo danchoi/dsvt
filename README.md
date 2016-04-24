@@ -54,4 +54,4 @@ True
 ```
 
 Be careful about Bash quoting. Use single quotes if you want to use a
-field number expression like $1, as with `awk`.
+field number expression like `$1`, as with `awk`.
