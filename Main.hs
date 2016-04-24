@@ -15,6 +15,7 @@ import Template
 data Options = Options {
       splitOnDelimiter :: Text -> [Text]
     , prettyIndent :: Bool
+    , compact :: Bool  
     , templateOpt :: TemplateOpt
     }
 
@@ -29,8 +30,9 @@ options = Options
             <> O.help "Default: whitespace")))
         <|> pure T.words)
     <*> O.flag False True 
-        (O.short 'i'
-        <> O.help "Pretty-indent HTML output. Default: False")
+        (O.short 'i' <> O.help "Pretty-indent HTML output. Default: False")
+    <*> O.flag False True 
+        (O.short 'c' <> O.help "Compact HTML - no line breaks between items")
     <*> ( (TemplateFile <$> 
           (O.strArgument 
             ( O.metavar "TEMPLATE-FILE" 
@@ -65,7 +67,7 @@ main = do
                 c = defContext { fields = fs' }
             in templateLine prettyIndent template c
           ) xs
-    mapM_ putStrLn res
+    mapM_ (if compact then putStr else putStrLn) res
 
 
 
