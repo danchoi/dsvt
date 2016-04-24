@@ -9,6 +9,7 @@ import Data.Functor.Identity (Identity)
 import Control.Monad.Reader
 import Data.List (intersperse)
 import Control.Arrow (first)
+import Safe (readMay)
 
 type Reader' = Reader Context 
 
@@ -43,7 +44,7 @@ exprEvalToString (StringChoice m) = do
         case trueKeys of
             [] -> ""
             xs -> mconcat $ intersperse " " $ xs 
-exprEvalToString (LiteralExpr x) = return . boolToText . litToBool $ x
+exprEvalToString (LiteralExpr x) = return . litToString $ x
 
 boolToText :: Bool -> Text 
 boolToText = pack . show 
@@ -63,8 +64,7 @@ exprEvalToBool (Or x y) = do
       if x' then return True else exprEvalToBool y
 -- see p.96 of Effective Awk Programming 3rd ed.
 exprEvalToBool (Compare op x y) = do
-      vx <- comparableValue x 
-      vy <- comparableValue y 
+      (vx, vy) <- comparableValues (x, y)
       return $
         case op of   
             ">" -> vx > vy
@@ -84,8 +84,26 @@ litToBool (LitString "") = False
 litToBool (LitNumber 0) = False
 litToBool _ = True
 
-comparableValue :: Expr -> Reader' ComparableValue
--- comparableValue "" = undefined
-comparableValue x = error $ "can't make comparable value for " ++ show x
+litToString :: Literal -> Text
+litToString (LitString s) = pack s
+litToString (LitNumber n) = pack . show $ n
+
+comparableValues :: (Expr, Expr) -> Reader' (ComparableValue, ComparableValue)
+comparableValues (LiteralExpr ((LitNumber x)), y) = do
+      y' <- exprEvalToString y
+      let y'' = maybe (error $ "Expected number, got: " ++ show y'')
+                      id $ readMay (unpack y')
+      return (ComparableNumber x, ComparableNumber y'')
+comparableValue (x, LiteralExpr (LitNumber y)) = do
+      x' <- exprEvalToString x
+      let x'' = maybe (error $ "Expected number, got: " ++ show x'')
+                      id $ readMay (unpack x')
+      return (ComparableNumber x'', ComparableNumber y)
+comparableValue (x, y) = do
+      x' <- exprEvalToString x
+      y' <- exprEvalToString y
+      return $ (ComparableString x', ComparableString y')
+
+
 
 

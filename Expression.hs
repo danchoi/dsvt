@@ -4,6 +4,7 @@ import Text.Parsec hiding (many, (<|>))
 import Control.Applicative
 import Text.Parsec hiding (many, (<|>))
 import Data.Functor.Identity (Identity)
+import Data.Text (Text)
 import qualified Data.Map as M
 import Data.Maybe (fromMaybe)
 
@@ -27,14 +28,14 @@ data Expr = FieldNum Int  -- access to DSV fields
           | LiteralExpr Literal -- used in the context of comparison
           deriving (Eq, Show)
 
-data Literal = LitString String | LitNumber Int 
+data Literal = LitString String | LitNumber Double
     deriving (Eq, Show)
 
 data TextChunk = PassThrough String | Interpolation String 
     deriving (Show, Eq)
 
-data ComparableValue = ComparableNumberValue Int
-                     | ComparableStringValue String
+data ComparableValue = ComparableNumber Double
+                     | ComparableString Text
     deriving (Ord, Eq, Show)
 
 type ExprParser = ParsecT String () Identity 
@@ -70,10 +71,32 @@ varName = many1 (alphaNum <|> char '$' <|> char '_')
 
 literalExpr = LiteralExpr <$> (litNumber <|> litString)
 
--- CHANGE To allow negative and double
-litNumber = LitNumber . read <$> many1 digit  
+
+-- https://www.schoolofhaskell.com/school/to-infinity-and-beyond/pick-of-the-week/parsing-floats-with-parsec
+------------------------------------------------------------------------
+
+(<++>) a b = (++) <$> a <*> b
+(<:>) a b = (:) <$> a <*> b
+
+number = many1 digit
+
+plus = char '+' *> number
+
+minus = char '-' <:> number
+
+integer = plus <|> minus <|> number
+
+float = fmap rd $ integer <++> decimal <++> exponent
+    where rd       = read :: String -> Double
+          decimal  = option "" $ char '.' <:> number
+          exponent = option "" $ oneOf "eE" <:> integer
+------------------------------------------------------------------------
+
+litNumber :: ExprParser Literal
+litNumber = LitNumber <$> float
 
 -- dumb simple implementation that does not deal with escaping
+litString :: ExprParser Literal
 litString = LitString <$> ((char '"' *> many (noneOf "\"") <* char '"') <|> (char '\'' *> many (noneOf "'") <* char '\''))
 
 

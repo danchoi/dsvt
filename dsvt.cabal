@@ -26,4 +26,5 @@ executable dsvt
                      , scientific
                      , optparse-applicative
                      , mtl
+                     , safe
   default-language:    Haskell2010
