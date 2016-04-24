@@ -11,6 +11,7 @@ import Eval
 import Expression
 import Text.XML.HXT.Core
 import Control.Monad.State (State, runState)
+import Control.Monad.Reader (Reader, runReader)
 
 type State' = State Context 
 type Arrow' = IOStateArrow Context XmlTree XmlTree
@@ -44,7 +45,10 @@ ngClass tag =
             changeAttrValue (\old -> mconcat [old, " ", newClassNames]) `when` hasName "class"
           )
               -- addAttr "class" classNames
-      ) $< (getAttrValue tag >>> arr (exprEvalToString context))
+      ) $< (getAttrValue tag 
+            >>> this &&& getState
+            >>> arr2 (\(attr, context) -> runReader (exprEvalToString attr) context)
+            )
       ) >>> removeAttr tag
     ) `when` hasNgAttr tag
      
@@ -52,7 +56,10 @@ ngShow :: String -> Arrow'
 ngShow tag = 
     (
       ((\boolVal -> if boolVal then this else none) 
-        $< (getAttrValue tag >>> arr (exprEvalToBool context . T.pack))
+        $< (getAttrValue tag 
+            >>> this &&& getState
+            >>> arr2 (\(attr, context) -> runReader (exprEvalToBool attr) context)
+            )
       ) >>> removeAttr tag
     ) `when` hasNgAttr tag
 
@@ -60,7 +67,10 @@ ngHide :: String -> Arrow'
 ngHide tag = 
     (
       ((\boolVal -> if boolVal then none else this) 
-        $< (getAttrValue tag >>> arr (exprEvalToBool context . T.pack))
+        $< (getAttrValue tag 
+            >>> this &&& getState
+            >>> arr2 (\(attr, context) -> runReader (exprEvalToBool attr) context)
+            )
       ) >>> removeAttr tag
     ) `when` hasNgAttr tag
 
@@ -69,19 +79,25 @@ ngBind tag =
     (
       --txt $< (getAttrValue tag >>> arr (exprEvalToString context) )
       replaceChildren (
-        (getAttrValue tag >>> arr (exprEvalToString context) ) >>> xread
+        (getAttrValue tag 
+          >>> this &&& getState
+          >>> arr2 (\(attr, context) -> runReader (exprEvalToString attr) context) 
+        ) 
+        >>> xread
       ) >>> removeAttr tag
     ) `when` hasNgAttr tag
 
 interpolateValues :: Arrow'
 interpolateValues = 
-      ((changeText (interpolateText context)) `when` isText)
+      ( (changeText 
+            (interpolateText context)
+        ) 
+        `when` isText)
       >>>
-      (processAttrl (changeAttrValue (interpolateText context)) `when` isElem)
+      processAttrl (changeAttrValue (interpolateText context)) `when` isElem
    
+interpolateText :: Context -> String -> String
 interpolateText context = mconcat .  map (evalText context) . parseText
-
-
 
 hasNgAttr :: ArrowXml a => String -> a XmlTree XmlTree
 hasNgAttr attrName = isElem >>> hasAttr attrName
