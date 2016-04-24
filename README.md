@@ -1,4 +1,4 @@
-# dsvt: 
+# dsvt
 
 Delimiter-separated value (DSV) templating. 
 
@@ -51,6 +51,9 @@ False
 dsvt $ dsvt-test -b '$2 == "banana"' 'apple banana'
 Compare "==" (FieldNum 2) (LiteralExpr (LitString "banana"))
 True
+dsvt $ dsvt-test '{apple: 10 > 1, banana: 3 > 0}'
+StringChoice (fromList [("apple",Compare ">" (LiteralExpr (LitNumber 10.0)) (LiteralExpr (LitNumber 1.0))),("banana",Compare ">" (LiteralExpr (LitNumber 3.0)) (LiteralExpr (LitNumber 0.0)))])
+"apple banana"
 ```
 
 Be careful about Bash quoting. Use single quotes if you want to use a
