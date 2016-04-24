@@ -59,7 +59,7 @@ stringChoice = do
 symbol :: String -> ExprParser String
 symbol s = spaces *> string s <* spaces
 
-comparisonOp = choice $ map (try . symbol) [">=", "<=", "!=", ">", "<", "=="]
+comparisonOp = choice $ map (try . symbol) [">=", "<=", "!=", "/=", "<>", ">", "<", "=="]
 
 exprTerm :: ExprParser Expr
 exprTerm = (char '(' *> expr <* char ')') <|> literalExpr <|> fieldNum
