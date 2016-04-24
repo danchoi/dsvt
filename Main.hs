@@ -9,6 +9,7 @@ import qualified Options.Applicative as O
 import Control.Applicative
 import Expression
 import Eval
+import Template
 
 data Options = Options {
       delimiter :: Text

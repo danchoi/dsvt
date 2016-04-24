@@ -27,6 +27,7 @@ executable dsvt
                      , optparse-applicative
                      , mtl
                      , safe
+                     , hxt
   default-language:    Haskell2010
 
 executable dsvt-test

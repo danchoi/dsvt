@@ -115,6 +115,8 @@ interpolateText context = mconcat .  map (evalText context) .  parseText
 parseText :: String -> [TextChunk]
 parseText = runParse (many textChunk) 
 
+
+
 textChunk :: ExprParser TextChunk
 textChunk = interpolationChunk <|> passThroughChunk
 

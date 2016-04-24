@@ -25,6 +25,10 @@ defContext = Context
       [] ["True", "true", "t", "T"] ["False", "false", "f", "F"]
       ["NULL", "null"]
 
+evalText :: TextChunk -> Reader' Text
+evalText (PassThrough s) = return $ pack s
+evalText (Interpolation s) = exprEvalToString (runParse expr s)
+
 exprEvalToString :: Expr -> Reader' Text
 exprEvalToString (FieldNum n) = do
       xs <- fields <$> ask 
