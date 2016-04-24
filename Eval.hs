@@ -79,7 +79,7 @@ litToString (LitString s) = pack s
 litToString (LitNumber n) = pack . show $ n
 
 comparableValues :: (Expr, Expr) -> Reader' (ComparableValue, ComparableValue)
-comparableValues (LiteralExpr ((LitNumber x)), y) = do
+comparableValues (LiteralExpr (LitNumber x), y) = do
       y' <- exprEvalToString y
       let y'' = maybe (error $ "Expected number, got: " ++ show y'')
                       id $ readMay (unpack y')
