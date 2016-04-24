@@ -36,6 +36,9 @@ True
 dsvt $ dsvt-test -b "10 > 10"
 Compare ">" (LiteralExpr (LitNumber 10.0)) (LiteralExpr (LitNumber 10.0))
 False
+dsvt $ dsvt-test '$1' 'apple'
+FieldNum 1
+"apple"
 dsvt-test  '$1 == "apple"' 'apple banana'
 Compare "==" (FieldNum 1) (LiteralExpr (LitString "apple"))
 "True"
@@ -49,3 +52,6 @@ dsvt $ dsvt-test -b '$2 == "banana"' 'apple banana'
 Compare "==" (FieldNum 2) (LiteralExpr (LitString "banana"))
 True
 ```
+
+Be careful about Bash quoting. Use single quotes if you want to use a
+field number expression like $1, as with `awk`.
