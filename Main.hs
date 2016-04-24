@@ -25,7 +25,7 @@ options :: O.Parser Options
 options = Options 
     <$> ((mkDelimiter <$> 
           (O.strOption 
-            (O.short 's' 
+            (O.short 'F' 
             <> O.metavar "DELIMITER" 
             <> O.help "Default: whitespace")))
         <|> pure T.words)
