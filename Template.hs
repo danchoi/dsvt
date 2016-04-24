@@ -29,7 +29,7 @@ processTemplate html =
 
 process :: Arrow'
 process = processTopDown (
-      >>> interpolateValues 
+      interpolateValues 
       >>> ngClass "ng-class"
       >>> ngShow "ng-show"
       >>> ngHide "ng-hide"
