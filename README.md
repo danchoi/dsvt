@@ -6,21 +6,33 @@ Takes a stream of DSV lines on STDIN, plus a HTML/XML template, and outputs one
 template unit per line.
 
 ```
-# template
+# template.html
 <p><b>{{ $1 }}</b> <span>{{ $2 }}</span></p>
 ```
 
 ```
-# input
+# input.txt
 banana $2.00
 apple $3.00
 beer $5.00
 ```
 
-```
-# output
+Command:
 
-```
+    cat input.txt | dsvt template.html
+    # output
+    <p><b>banana</b> <span>$2.00</span></p>
+    <p><b>apple</b> <span>$3.00</span></p>
+    <p><b>beer</b> <span>$5.00</span></p>
+
+Directives:
+
+* ng-class
+* ng-show
+* ng-hide
+* ng-bind
+
+TBA
 
 ### dsvt-test
 
