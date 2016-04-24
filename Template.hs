@@ -11,13 +11,14 @@ import Eval
 import Expression
 import Text.XML.HXT.Core
 import Control.Monad.State (State, runState)
+import Text.XML.HXT.Arrow.XmlState.RunIOStateArrow
 import Control.Monad.Reader (Reader, runReader)
 
 type State' = State Context 
-type Arrow' = IOStateArrow Context XmlTree XmlTree
+type Arrow' = IOSLA (XIOState Context) XmlTree XmlTree
 
 run rawHTML context = do
-    (_,res) <- runIOSLA (processTemplate rawHTML) context undefined
+    (_,res) <- runIOSLA (processTemplate rawHTML) (initialState context) undefined
     return res
 
 processTemplate html = 
@@ -29,9 +30,9 @@ processTemplate html =
 process :: Arrow'
 process = processTopDown (
       >>> interpolateValues 
-      >>> ngClass 
-      >>> ngShow 
-      >>> ngHide 
+      >>> ngClass "ng-class"
+      >>> ngShow "ng-show"
+      >>> ngHide "ng-hide"
       >>> ngBind "ng-bind"
     )
 
@@ -45,61 +46,58 @@ ngClass tag =
             changeAttrValue (\old -> mconcat [old, " ", newClassNames]) `when` hasName "class"
           )
               -- addAttr "class" classNames
-      ) $< (getAttrValue tag 
-            >>> this &&& getState
-            >>> arr2 (\(attr, context) -> runReader (exprEvalToString attr) context)
+      ) $< (getAttrValue tag &&& getUserState
+            >>> arr (\(attr, context) -> runEvalToString context attr)
             )
       ) >>> removeAttr tag
-    ) `when` hasNgAttr tag
+    ) `when` hasElemAttr tag
      
 ngShow :: String -> Arrow'
 ngShow tag = 
     (
       ((\boolVal -> if boolVal then this else none) 
-        $< (getAttrValue tag 
-            >>> this &&& getState
-            >>> arr2 (\(attr, context) -> runReader (exprEvalToBool attr) context)
+        $< (getAttrValue tag &&& getUserState
+            >>> arr (\(attr, context) -> runEvalToBool context attr)
             )
       ) >>> removeAttr tag
-    ) `when` hasNgAttr tag
+    ) `when` hasElemAttr tag
 
 ngHide :: String -> Arrow'
 ngHide tag = 
     (
       ((\boolVal -> if boolVal then none else this) 
         $< (getAttrValue tag 
-            >>> this &&& getState
-            >>> arr2 (\(attr, context) -> runReader (exprEvalToBool attr) context)
+            >>> this &&& getUserState
+            >>> arr (\(attr, context) -> runEvalToBool context attr)
             )
       ) >>> removeAttr tag
-    ) `when` hasNgAttr tag
+    ) `when` hasElemAttr tag
 
 ngBind :: String -> Arrow'
 ngBind tag = 
     (
-      --txt $< (getAttrValue tag >>> arr (exprEvalToString context) )
       replaceChildren (
         (getAttrValue tag 
-          >>> this &&& getState
-          >>> arr2 (\(attr, context) -> runReader (exprEvalToString attr) context) 
+         >>> (this &&& getUserState)
+         >>> arr (\(attr, context) -> runEvalToString context attr) 
         ) 
         >>> xread
       ) >>> removeAttr tag
-    ) `when` hasNgAttr tag
+    ) `when` hasElemAttr tag
 
 interpolateValues :: Arrow'
 interpolateValues = 
-      ( (changeText 
-            (interpolateText context)
-        ) 
-        `when` isText)
+    (\context ->
+      ((changeText 
+            (interpolateText context)) `when` isText)
       >>>
       processAttrl (changeAttrValue (interpolateText context)) `when` isElem
+    ) $< getUserState
    
 interpolateText :: Context -> String -> String
-interpolateText context = mconcat .  map (evalText context) . parseText
+interpolateText context = runEvalText context
 
-hasNgAttr :: ArrowXml a => String -> a XmlTree XmlTree
-hasNgAttr attrName = isElem >>> hasAttr attrName
+hasElemAttr :: ArrowXml a => String -> a XmlTree XmlTree
+hasElemAttr attrName = isElem >>> hasAttr attrName
 
 

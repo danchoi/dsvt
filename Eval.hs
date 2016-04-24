@@ -20,10 +20,24 @@ data Context = Context {
     , nullStrings :: [Text]
     } deriving Show
 
+runEvalToString :: Context -> String -> String
+runEvalToString c s = 
+    unpack $ runReader (exprEvalToString $ runParse expr s) c
+
+runEvalToBool :: Context -> String -> Bool
+runEvalToBool c s = runReader (exprEvalToBool $ runParse expr s) c
+
 defContext :: Context 
 defContext = Context 
       [] ["True", "true", "t", "T"] ["False", "false", "f", "F"]
       ["NULL", "null"]
+
+runEvalText :: Context -> String -> String
+runEvalText c s = 
+    let cs = parseText s
+        t :: [Text]
+        t = runReader (mapM evalText cs) c
+    in unpack $ mconcat t
 
 evalText :: TextChunk -> Reader' Text
 evalText (PassThrough s) = return $ pack s
