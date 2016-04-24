@@ -17,9 +17,10 @@ import Control.Monad.Reader (Reader, runReader)
 type State' = State Context 
 type Arrow' = IOSLA (XIOState Context) XmlTree XmlTree
 
-run rawHTML context = do
+templateLine :: String -> Context -> IO String
+templateLine rawHTML context = do
     (_,res) <- runIOSLA (processTemplate rawHTML) (initialState context) undefined
-    return res
+    return $ concat res
 
 processTemplate html = 
     readString [withValidate no, withParseHTML yes, withInputEncoding utf8] html
