@@ -20,6 +20,11 @@ data Context = Context {
     , nullStrings :: [Text]
     } deriving Show
 
+defContext :: Context 
+defContext = Context 
+      [] ["True", "true", "t", "T"] ["False", "false", "f", "F"]
+      ["NULL", "null"]
+
 exprEvalToString :: Expr -> Reader' Text
 exprEvalToString (FieldNum n) = do
       xs <- fields <$> ask 
