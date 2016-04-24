@@ -20,16 +20,6 @@ data Context = Context {
     , nullStrings :: [Text]
     } deriving Show
 
-{-
-exprEvalToString :: Expr -> Reader' String
-exprEvalToString e = undefined
-
-evalToBool :: Expr -> Reader' Bool
-evalToBool e =
-    let val = exprEval expr context
-    in valueToBool val
--}
-
 exprEvalToString :: Expr -> Reader' Text
 exprEvalToString (FieldNum n) = do
       xs <- fields <$> ask 
