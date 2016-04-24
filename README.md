@@ -5,6 +5,8 @@ Delimiter-separated value (DSV) templating.
 Takes a stream of DSV lines on STDIN, plus a HTML/XML template, and outputs one
 template unit per line.
 
+The template is parsed by HXT, and thus must be valid HTML or XML.
+
 ```
 # template.html
 <p><b>{{ $1 }}</b> <span>{{ $2 }}</span></p>
