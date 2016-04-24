@@ -9,7 +9,7 @@ import Data.Functor.Identity (Identity)
 import Control.Monad.Reader
 import Data.List (intersperse)
 import Control.Arrow (first)
-import Safe (readMay)
+import Safe (readMay, at)
 
 type Reader' = Reader Context 
 
@@ -28,7 +28,7 @@ defContext = Context
 exprEvalToString :: Expr -> Reader' Text
 exprEvalToString (FieldNum n) = do
       xs <- fields <$> ask 
-      return $ xs !! (n - 1)
+      return $ xs `at` (n - 1)
 exprEvalToString x@(And _ _) = boolToText <$> exprEvalToBool x
 exprEvalToString x@(Or _ _) = boolToText <$> exprEvalToBool x
 exprEvalToString x@(Compare _ _ _) = boolToText <$> exprEvalToBool x
