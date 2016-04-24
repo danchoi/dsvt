@@ -15,8 +15,10 @@ import Template
 data Options = Options {
       splitOnDelimiter :: Text -> [Text]
     , prettyIndent :: Bool
-    , templateFile :: FilePath
+    , templateOpt :: TemplateOpt
     }
+
+data TemplateOpt = TemplateFile FilePath | TemplateString String
 
 options :: O.Parser Options
 options = Options 
@@ -29,9 +31,19 @@ options = Options
     <*> O.flag False True 
         (O.short 'i'
         <> O.help "Pretty-indent HTML output. Default: False")
-    <*> O.strArgument 
-        ( O.metavar "TEMPLATE-FILE" 
-        <> O.help "Template file path")
+    <*> ( (TemplateFile <$> 
+          (O.strArgument 
+            ( O.metavar "TEMPLATE-FILE" 
+            <> O.help "Template file path")))
+        <|> 
+          (TemplateString <$>
+            (O.strOption 
+              (O.short 'e'
+              <> O.metavar "TEMPLATE-STRING"
+              <> O.help "Template as inline string"
+              )
+            ))
+        )
 
 opts :: O.ParserInfo Options
 opts = O.info (O.helper <*> options) 
@@ -43,7 +55,9 @@ mkDelimiter s = T.splitOn (T.pack s)
 
 main = do
     Options{..} <- O.execParser opts
-    template <- readFile templateFile
+    template <- case templateOpt of
+                  TemplateFile f -> readFile f
+                  TemplateString s -> return s
     xs <- TL.lines <$> TL.getContents
     res <- 
       mapM (\line -> 
