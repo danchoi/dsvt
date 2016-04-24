@@ -62,7 +62,7 @@ symbol s = spaces *> string s <* spaces
 comparisonOp = choice $ map (try . symbol) [">=", "<=", "!=", "/=", "<>", ">", "<", "=="]
 
 exprTerm :: ExprParser Expr
-exprTerm = (char '(' *> expr <* char ')') <|> literalExpr <|> fieldNum
+exprTerm = (char '(' *> expr <* char ')') <|> fieldNum <|> literalExpr 
 
 fieldNum :: ExprParser Expr
 fieldNum = (FieldNum . read) <$> (char '$' *> many1 digit)

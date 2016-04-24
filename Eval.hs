@@ -89,12 +89,12 @@ comparableValues (LiteralExpr (LitNumber x), y) = do
       let y'' = maybe (error $ "Expected number, got: " ++ show y'')
                       id $ readMay (unpack y')
       return (ComparableNumber x, ComparableNumber y'')
-comparableValue (x, LiteralExpr (LitNumber y)) = do
+comparableValues (x, LiteralExpr (LitNumber y)) = do
       x' <- exprEvalToString x
       let x'' = maybe (error $ "Expected number, got: " ++ show x'')
                       id $ readMay (unpack x')
       return (ComparableNumber x'', ComparableNumber y)
-comparableValue (x, y) = do
+comparableValues (x, y) = do
       x' <- exprEvalToString x
       y' <- exprEvalToString y
       return $ (ComparableString x', ComparableString y')

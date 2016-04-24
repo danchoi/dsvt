@@ -11,8 +11,16 @@ template unit per line.
 This tool lets you test dsvt expressions.
 
 ```
+dsvt-test
+
 Usage: dsvt-test EXPRESSION [-b] [FIELDS]
   DSV templating
+
+Available options:
+  -h,--help                Show this help text
+  EXPRESSION               Expression
+  -b                       Evaluate to Bool; default String
+  FIELDS                   Test field values, space-delimited
 ```
 
 Examples:
@@ -28,5 +36,16 @@ True
 dsvt $ dsvt-test -b "10 > 10"
 Compare ">" (LiteralExpr (LitNumber 10.0)) (LiteralExpr (LitNumber 10.0))
 False
+dsvt-test  '$1 == "apple"' 'apple banana'
+Compare "==" (FieldNum 1) (LiteralExpr (LitString "apple"))
+"True"
+dsvt $ dsvt-test -b '$1 == "apple"' 'apple banana'
+Compare "==" (FieldNum 1) (LiteralExpr (LitString "apple"))
+True
+dsvt $ dsvt-test -b '$2 == "apple"' 'apple banana'
+Compare "==" (FieldNum 2) (LiteralExpr (LitString "apple"))
+False
+dsvt $ dsvt-test -b '$2 == "banana"' 'apple banana'
+Compare "==" (FieldNum 2) (LiteralExpr (LitString "banana"))
+True
 ```
-
