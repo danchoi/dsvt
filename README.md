@@ -17,7 +17,7 @@ Usage: dsvt [-s DELIMITER] [-i] [-c] (TEMPLATE-FILE | -e TEMPLATE-STRING)
 
 Available options:
   -h,--help                Show this help text
-  -s DELIMITER             Default: whitespace
+  -F DELIMITER             Default: whitespace
   -i                       Pretty-indent HTML output. Default: False
   -c                       Compact HTML - no line breaks between items
   TEMPLATE-FILE            Template file path
