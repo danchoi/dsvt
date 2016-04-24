@@ -7,6 +7,23 @@ template unit per line.
 
 The template is parsed by HXT, and thus must be valid HTML or XML.
 
+## Usage
+
+```
+dsvt
+
+Usage: dsvt [-s DELIMITER] [-i] [-c] (TEMPLATE-FILE | -e TEMPLATE-STRING)
+  DSV templating
+
+Available options:
+  -h,--help                Show this help text
+  -s DELIMITER             Default: whitespace
+  -i                       Pretty-indent HTML output. Default: False
+  -c                       Compact HTML - no line breaks between items
+  TEMPLATE-FILE            Template file path
+  -e TEMPLATE-STRING       Template as inline string
+```
+
 ```
 # template.html
 <p><b>{{ $1 }}</b> <span>{{ $2 }}</span></p>
